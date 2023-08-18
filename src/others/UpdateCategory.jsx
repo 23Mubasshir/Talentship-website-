@@ -1,0 +1,62 @@
+import React, { useEffect, useState } from 'react'
+import Siderbar from '../components/Siderbar'
+import { useNavigate, useParams } from 'react-router-dom'
+import Swal from 'sweetalert2';
+import axios from 'axios';
+
+const UpdateCategory = () => {
+    const {id} = useParams();
+    const [categoryName,setcatname] = useState();
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        axios.get('http://localhost:7000/api/category/'+id)
+        .then(result => {
+          console.log(result.data.categoryName)
+          setcatname(result.data.categoryName)
+        })
+        .catch(err => console.error(err))
+      }, [])
+
+      const updateForm = (e) => {
+        e.preventDefault();
+        axios.put('http://localhost:7000/api/category/'+id,{categoryName})
+        .then(result => {
+          Swal.fire({
+            title:'Category Updated',
+            icon:'success',
+            toast:true,
+            timer:3000,
+            position:'top-right',
+            timerProgressBar: true,
+            showConfirmButton: false
+        });
+          navigate('/category')
+        })
+        .catch(err => console.error)
+      }
+
+  return (
+    <div className='container mt-4'>
+    <div className='row'>
+        <aside className='col-md-3'>
+            <Siderbar />
+        </aside>
+        <section className='col-md-9'>
+            <div className='card'>
+                <h3 className='card-header'>Update Category</h3>
+                <div className='card-body'>
+                     <div className="mb-3">
+                        <label for="title" className="form-label">Category Name</label>
+                        <input value={categoryName} onChange={(e) => setcatname(e.target.value)} type="text"  name='title' className="form-control"/>
+                    </div>
+                    <button type="button" onClick={updateForm} className="btn btn-primary">Update</button>
+                </div>
+            </div>
+        </section>
+    </div>
+    </div>
+  )
+}
+
+export default UpdateCategory
